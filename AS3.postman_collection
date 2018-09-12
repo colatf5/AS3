@@ -1,0 +1,169 @@
+{
+	"variables": [],
+	"info": {
+		"name": "AS3",
+		"_postman_id": "43b6a8c1-2491-7ba9-620e-f93303222ed9",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Auth Token copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"eval(postman.getGlobalVariable(\"_f5_workflow_functions\"));",
+							"",
+							"var populate_vars = [",
+							"        {name:\"bigip-token\", value:\"token.token\"}",
+							"    ];",
+							"    ",
+							"f5_populate_env_vars(populate_vars);"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "https://{{bigip}}/mgmt/shared/authn/login",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"admin\",\n\t\"password\": \"admin\",\n\t\"loginProviderName\": \"tmos\"\n}"
+				},
+				"description": "Get Authentication Token from big-iq"
+			},
+			"response": []
+		},
+		{
+			"name": "Step 4: Set Authentication Token Timeout copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"eval(postman.getGlobalVariable(\"_f5_workflow_functions\"));",
+							"",
+							"var check_vals = [",
+							"        { ",
+							"            \"path\":\"timeout\", ",
+							"            \"value\":\"36000\" ",
+							"        }",
+							"    ];",
+							"",
+							"f5_check_response(check_vals);",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "https://{{bigip}}/mgmt/shared/authz/tokens/{{bigip-token}}",
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{bigip-token}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"timeout\":\"36000\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "SelfTest",
+			"request": {
+				"url": "https://{{bigip}}/mgmt/shared/appsvcs/selftest",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{bigip-token}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{}"
+				},
+				"description": "Get Authentication Token from big-iq"
+			},
+			"response": []
+		},
+		{
+			"name": "DeployApp",
+			"request": {
+				"url": "https://{{bigip}}/mgmt/shared/appsvcs/declare",
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{bigip-token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": " {\n     \"class\": \"AS3\",\n     \"action\": \"deploy\",\n     \"persist\": true,\n     \"declaration\": {\n         \"class\": \"ADC\",\n         \"schemaVersion\": \"3.0.0\",\n         \"id\": \"urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d\",\n         \"label\": \"Sample 1\",\n         \"remark\": \"Simple HTTP Service with Round-Robin Load Balancing\",\n         \"Sample_01\": {\n             \"class\": \"Tenant\",\n             \"A1\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.0.1.10\"\n                     ],\n                     \"pool\": \"web_pool\"\n                 },\n                 \"web_pool\": {\n                     \"class\": \"Pool\",\n                     \"monitors\": [\n                         \"http\"\n                     ],\n                     \"members\": [\n                         {\n                             \"servicePort\": 80,\n                             \"serverAddresses\": [\n                                 \"192.0.1.10\",\n                                 \"192.0.1.11\"\n                             ]\n                         }\n                     ]\n                 }\n             }\n         }\n     }\n }"
+				},
+				"description": "1 x vip, 2 x pool members"
+			},
+			"response": []
+		},
+		{
+			"name": "enable_pool_member",
+			"request": {
+				"url": "https://{{bigip}}/mgmt/shared/appsvcs/declare",
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{bigip-token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": " {\n     \"class\": \"AS3\",\n     \"action\": \"redeploy\",\n     \"persist\": true,\n     \"declaration\": {\n         \"class\": \"ADC\",\n         \"schemaVersion\": \"3.0.0\",\n         \"id\": \"urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d\",\n         \"label\": \"Sample 1\",\n         \"remark\": \"Simple HTTP Service with Round-Robin Load Balancing\",\n         \"Sample_01\": {\n             \"class\": \"Tenant\",\n             \"A1\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.0.1.10\"\n                     ],\n                     \"pool\": \"web_pool\"\n                 },\n                 \"web_pool\": {\n                     \"class\": \"Pool\",\n                     \"monitors\": [\n                         \"http\"\n                     ],\n                     \"members\": [\n                         {\n                             \"servicePort\": 80,\n                             \"serverAddresses\": [\n                                 \"192.0.1.10\"\n                             ],\n                             \"enable\": false\n                         }\n                     ]\n                 }\n             }\n         }\n     }\n }"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
