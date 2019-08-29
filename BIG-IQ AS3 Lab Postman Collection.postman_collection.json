@@ -1,0 +1,416 @@
+{
+	"info": {
+		"_postman_id": "d389fcd9-9a52-4afb-8e98-7c6224a97087",
+		"name": "BIG-IQ AS3 Lab Postman Collection",
+		"description": "Postman Echo is service you can use to test your REST clients and make sample API calls. It provides endpoints for `GET`, `POST`, `PUT`, various auth mechanisms and other utility endpoints.\n\nThe documentation for the endpoints as well as example responses can be found at [https://postman-echo.com](https://postman-echo.com/?source=echo-collection-app-onboarding)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"_postman_id": "395b5f67-bf7b-40ef-9157-28ce88341f88",
+			"name": "BIG-IQ Token (david)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c978da4e-54b1-4f35-be8a-3a69a68fa973",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.globals.set(\"_f5_token\", jsonData.token.token);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"david\",\r\n  \"password\": \"david\",\r\n  \"loginProviderName\": \"RadiusServer\"\r\n}"
+				},
+				"url": {
+					"raw": "https://10.1.1.4/mgmt/shared/authn/login",
+					"protocol": "https",
+					"host": [
+						"10",
+						"1",
+						"1",
+						"4"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"authn",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "e058f5c0-ddd5-4f7c-b7d8-ff8485e773e4",
+			"name": "BIG-IQ Token (olivia)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c978da4e-54b1-4f35-be8a-3a69a68fa973",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.globals.set(\"_f5_token\", jsonData.token.token);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"olivia\",\r\n  \"password\": \"olivia\",\r\n  \"loginProviderName\": \"tmos\"\r\n}"
+				},
+				"url": {
+					"raw": "https://10.1.1.4/mgmt/shared/authn/login",
+					"protocol": "https",
+					"host": [
+						"10",
+						"1",
+						"1",
+						"4"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"authn",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "0d66f0f6-1ea0-4d4c-93d5-92ea9edef465",
+			"name": "BIG-IQ AS3 Declaration",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"class\": \"AS3\",\r\n    \"action\": \"deploy\",\r\n    \"declaration\": {\r\n        \"class\": \"ADC\",\r\n        \"schemaVersion\": \"3.7.0\",\r\n        \"id\": \"fghijkl7890\",\r\n        \"label\": \"Sample 1\",\r\n        \"remark\": \"HTTP with custom persistence\",\r\n        \"target\": {\r\n            \"hostname\": \"SEA-vBIGIP01.termmarc.com\"\r\n        },\r\n        \"Sample_http_01\": {\r\n            \"class\": \"Tenant\",\r\n            \"A1\": {\r\n                \"class\": \"Application\",\r\n                \"template\": \"http\",\r\n                \"serviceMain\": {\r\n                    \"class\": \"Service_HTTP\",\r\n                    \"virtualAddresses\": [\r\n                        \"10.1.10.110\"\r\n                    ],\r\n                    \"pool\": \"web_pool\",\r\n                    \"persistenceMethods\": [{\r\n                        \"use\": \"jsessionid\"\r\n                    }]\r\n                },\r\n                \"web_pool\": {\r\n                    \"class\": \"Pool\",\r\n                    \"monitors\": [\r\n                        \"http\"\r\n                    ],\r\n                    \"members\": [{\r\n                    \"servicePort\": 8082,\r\n                    \"serverAddresses\": [\r\n                        \"10.1.20.5\"\r\n                    ]\r\n                    },\r\n                    {\r\n                    \t\"servicePort\":8080,\r\n                    \"serverAddresses\": [\r\n                    \t\"10.1.20.5\"\r\n                    ]}\r\n                  ]\r\n                },\r\n                \"jsessionid\": {\r\n                    \"class\": \"Persist\",\r\n                    \"persistenceMethod\": \"cookie\",\r\n                    \"cookieMethod\": \"hash\",\r\n                    \"cookieName\": \"JSESSIONID\"\r\n                }\r\n            }\r\n        }\r\n    }\r\n}"
+				},
+				"url": {
+					"raw": "https://10.1.1.4/mgmt/shared/appsvcs/declare?async=true",
+					"protocol": "https",
+					"host": [
+						"10",
+						"1",
+						"1",
+						"4"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare"
+					],
+					"query": [
+						{
+							"key": "async",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "bb086884-b4a8-40fd-b728-a6dcc0978987",
+			"name": "BIG-IQ AS3 Declaration with Analytics - 10.1.x0.112",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"class\": \"AS3\",\r\n    \"action\": \"deploy\",\r\n    \"declaration\": {\r\n        \"class\": \"ADC\",\r\n        \"schemaVersion\": \"3.7.0\",\r\n        \"id\": \"fghijkl7890\",\r\n        \"label\": \"Sample 2\",\r\n        \"remark\": \"HTTP with custom persistence\",\r\n        \"target\": {\r\n            \"hostname\": \"SEA-vBIGIP01.termmarc.com\"\r\n        },\r\n        \"AppWithAnalytics\": {\r\n            \"class\": \"Tenant\",\r\n            \"Web\": {\r\n                \"class\": \"Application\",\r\n                \"template\": \"http\",\r\n                \"statsProfile\": {\r\n                     \"collectMethod\": false,\r\n                     \"collectClientSideStatistics\": true,\r\n                     \"class\": \"Analytics_Profile\",\r\n                     \"collectIp\": true,\r\n                     \"collectPageLoadTime\": true,\r\n                     \"collectUrl\": true,\r\n                     \"collectOsAndBrowser\": true\r\n                },\r\n                \"serviceMain\": {\r\n                    \"class\": \"Service_HTTP\",\r\n                    \"virtualAddresses\": [\r\n                        \"10.1.10.112\"\r\n                    ],\r\n                    \"profileAnalytics\": {\r\n                        \"use\": \"/AppWithAnalytics/Web/statsProfile\"\r\n                    },\r\n                    \"pool\": \"web_pool\",\r\n                    \"persistenceMethods\": [{\r\n                        \"use\": \"jsessionid\"\r\n                    }]\r\n                },\r\n                \"web_pool\": {\r\n                    \"class\": \"Pool\",\r\n                    \"monitors\": [\r\n                        \"http\"\r\n                    ],\r\n                    \"members\": [{\r\n                    \"servicePort\": 8082,\r\n                    \"serverAddresses\": [\r\n                        \"10.1.20.112\"\r\n                    ]\r\n                    },\r\n                    {\r\n                    \t\"servicePort\":80,\r\n                    \"serverAddresses\": [\r\n                    \t\"10.1.20.112\"\r\n                    ]}\r\n                  ]\r\n                },\r\n                \"jsessionid\": {\r\n                    \"class\": \"Persist\",\r\n                    \"persistenceMethod\": \"cookie\",\r\n                    \"cookieMethod\": \"hash\",\r\n                    \"cookieName\": \"JSESSIONID\"\r\n                }\r\n            }\r\n        }\r\n    }\r\n}"
+				},
+				"url": {
+					"raw": "https://10.1.1.4/mgmt/shared/appsvcs/declare?async=true",
+					"protocol": "https",
+					"host": [
+						"10",
+						"1",
+						"1",
+						"4"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare"
+					],
+					"query": [
+						{
+							"key": "async",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "e75b301f-c6c0-4b79-bbbe-24829a797701",
+			"name": "BIG-IQ AS3 Declaration with Analytics - 10.1.x0.113",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"class\": \"AS3\",\r\n    \"action\": \"deploy\",\r\n    \"declaration\": {\r\n        \"class\": \"ADC\",\r\n        \"schemaVersion\": \"3.7.0\",\r\n        \"id\": \"fghijkl7890\",\r\n        \"label\": \"Sample 2\",\r\n        \"remark\": \"HTTP with custom persistence\",\r\n        \"target\": {\r\n            \"hostname\": \"SEA-vBIGIP01.termmarc.com\"\r\n        },\r\n        \"HR_App\": {\r\n            \"class\": \"Tenant\",\r\n            \"Web\": {\r\n                \"class\": \"Application\",\r\n                \"template\": \"http\",\r\n                \"statsProfile\": {\r\n                     \"collectMethod\": false,\r\n                     \"collectClientSideStatistics\": true,\r\n                     \"class\": \"Analytics_Profile\",\r\n                     \"collectIp\": true,\r\n                     \"collectPageLoadTime\": true,\r\n                     \"collectUrl\": true,\r\n                     \"collectMaxTpsAndThroughput\": true,\r\n                     \"collectUserAgent\": true,\r\n                     \"collectUserSession\": true,\r\n                     \"collectMethod\": true,\r\n                     \"capturedTrafficInternalLogging\": true,\r\n                     \"captureFilter\": {\r\n                     \t\"requestCapturedParts\": \"headers\",\r\n                     \t\"responseCapturedParts\": \"headers\"\r\n                     },\r\n                     \"collectOsAndBrowser\": true\r\n                },\r\n                \"serviceMain\": {\r\n                    \"class\": \"Service_HTTP\",\r\n                    \"virtualAddresses\": [\r\n                        \"10.1.10.113\"\r\n                    ],\r\n                    \"profileAnalytics\": {\r\n                        \"use\": \"/HR_App/Web/statsProfile\"\r\n                    },\r\n                    \"pool\": \"web_pool\",\r\n                    \"persistenceMethods\": [{\r\n                        \"use\": \"jsessionid\"\r\n                    }]\r\n                },\r\n                \"web_pool\": {\r\n                    \"class\": \"Pool\",\r\n                    \"monitors\": [\r\n                        \"http\"\r\n                    ],\r\n                    \"members\": [{\r\n                    \"servicePort\": 8082,\r\n                    \"serverAddresses\": [\r\n                        \"10.1.20.113\"\r\n                    ]\r\n                    },\r\n                    {\r\n                    \t\"servicePort\":80,\r\n                    \"serverAddresses\": [\r\n                    \t\"10.1.20.113\"\r\n                    ]}\r\n                  ]\r\n                },\r\n                \"jsessionid\": {\r\n                    \"class\": \"Persist\",\r\n                    \"persistenceMethod\": \"cookie\",\r\n                    \"cookieMethod\": \"hash\",\r\n                    \"cookieName\": \"JSESSIONID\"\r\n                }\r\n            }\r\n        }\r\n    }\r\n}"
+				},
+				"url": {
+					"raw": "https://10.1.1.4/mgmt/shared/appsvcs/declare?async=true",
+					"protocol": "https",
+					"host": [
+						"10",
+						"1",
+						"1",
+						"4"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare"
+					],
+					"query": [
+						{
+							"key": "async",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "e796f5d9-8486-494d-8553-65ff10311113",
+			"name": "BIG-IQ AS3 Remove",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"class\": \"AS3\",\r\n    \"action\": \"remove\",\r\n    \"declaration\": {\r\n        \"class\": \"ADC\",\r\n        \"schemaVersion\": \"3.7.0\",\r\n        \"id\": \"fghijkl7890\",\r\n        \"label\": \"Sample 1\",\r\n        \"remark\": \"HTTP with custom persistence\",\r\n        \"target\": {\r\n            \"hostname\": \"SJC-vBIGIP01.termmarc.com\"\r\n        },\r\n        \"Sample_http_01\": {\r\n            \"class\": \"Tenant\",\r\n            \"A1\": {\r\n                \"class\": \"Application\",\r\n                \"template\": \"http\",\r\n                \"serviceMain\": {\r\n                    \"class\": \"Service_HTTP\",\r\n                    \"virtualAddresses\": [\r\n                        \"10.0.2.10\"\r\n                    ],\r\n                    \"pool\": \"web_pool\",\r\n                    \"persistenceMethods\": [{\r\n                        \"use\": \"jsessionid\"\r\n                    }]\r\n                },\r\n                \"web_pool\": {\r\n                    \"class\": \"Pool\",\r\n                    \"monitors\": [\r\n                        \"http\"\r\n                    ],\r\n                    \"members\": [{\r\n                    \"servicePort\": 8082,\r\n                    \"serverAddresses\": [\r\n                        \"10.1.20.5\"\r\n                    ]\r\n                    },\r\n                    {\r\n                    \t\"servicePort\":8080,\r\n                    \"serverAddresses\": [\r\n                    \t\"10.1.20.5\"\r\n                    ]}\r\n                  ]\r\n                },\r\n                \"jsessionid\": {\r\n                    \"class\": \"Persist\",\r\n                    \"persistenceMethod\": \"cookie\",\r\n                    \"cookieMethod\": \"hash\",\r\n                    \"cookieName\": \"JSESSIONID\"\r\n                }\r\n            }\r\n        }\r\n    }\r\n}"
+				},
+				"url": {
+					"raw": "https://10.1.1.4/mgmt/shared/appsvcs/declare?async=true",
+					"protocol": "https",
+					"host": [
+						"10",
+						"1",
+						"1",
+						"4"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare"
+					],
+					"query": [
+						{
+							"key": "async",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "dae88182-545a-4de9-81ba-b644889ce880",
+			"name": "BIG-IQ Check AS3 Deployment Task",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://10.1.1.4/mgmt/shared/appsvcs/task/",
+					"protocol": "https",
+					"host": [
+						"10",
+						"1",
+						"1",
+						"4"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"task",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "3069a10a-40a3-4a9a-852a-113e9e3458c1",
+			"name": "BIG-IQ AS3 Templates Creation",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://10.1.1.4/mgmt/cm/global/appsvcs-templates",
+					"protocol": "https",
+					"host": [
+						"10",
+						"1",
+						"1",
+						"4"
+					],
+					"path": [
+						"mgmt",
+						"cm",
+						"global",
+						"appsvcs-templates"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "b537e434-44cb-4c16-b3f1-43381e4d74cb",
+			"name": "BIG-IQ AS3 Templates List",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://10.1.1.4/mgmt/cm/global/appsvcs-templates",
+					"protocol": "https",
+					"host": [
+						"10",
+						"1",
+						"1",
+						"4"
+					],
+					"path": [
+						"mgmt",
+						"cm",
+						"global",
+						"appsvcs-templates"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
