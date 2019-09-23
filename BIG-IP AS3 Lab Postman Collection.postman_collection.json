@@ -1,0 +1,472 @@
+{
+	"info": {
+		"_postman_id": "4e742b38-ffd0-463b-ba5a-4fe0b4a0d88b",
+		"name": "BIG-IP AS3 Lab Postman Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"_postman_id": "78091b0f-7e08-4994-9407-ca9aedfba320",
+			"name": "Get Auth Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a51be383-d8c5-4808-80fd-f2db3e1d4431",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.globals.set(\"_f5_token\", jsonData.token.token);"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"admin\",\n\t\"password\": \"purple123\",\n\t\"loginProviderName\": \"tmos\"\n}"
+				},
+				"url": {
+					"raw": "https://{{bigip}}/mgmt/shared/authn/login",
+					"protocol": "https",
+					"host": [
+						"{{bigip}}"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"authn",
+						"login"
+					]
+				},
+				"description": "Get Authentication Token from big-iq"
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "46c1ba24-7266-4cbb-8da2-9b082c69f523",
+			"name": "Set Auth Token Timeout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d02faab8-126f-4c35-84cf-39038a21d233",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"timeout\":\"36000\"\n}"
+				},
+				"url": {
+					"raw": "https://{{bigip}}/mgmt/shared/authz/tokens/{{_f5_token}}",
+					"protocol": "https",
+					"host": [
+						"{{bigip}}"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"authz",
+						"tokens",
+						"{{_f5_token}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "a794e804-04e1-4e82-a885-35846634344d",
+			"name": "Is AS3 there?",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{}"
+				},
+				"url": {
+					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/info",
+					"protocol": "https",
+					"host": [
+						"{{bigip}}"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"info"
+					]
+				},
+				"description": "Get Authentication Token from big-iq"
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "43a7f383-b875-48ce-8917-0922d43d1f8f",
+			"name": "DeploySingleHttpApp - 130",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": " {\n     \"$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json\",\n     \"class\": \"AS3\",\n     \"action\": \"deploy\",\n     \"persist\": true,\n     \"declaration\": {\n         \"class\": \"ADC\",\n         \"schemaVersion\": \"3.0.0\",\n         \"id\": \"urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d\",\n         \"label\": \"Seattle\",\n         \"remark\": \"Simple Web App\",\n         \"Direct_Web\": {\n             \"class\": \"Tenant\",\n             \"search\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.1.10.230\"\n                     ],\n                     \"pool\": \"web_pool\"\n                 },\n                 \"web_pool\": {\n                     \"class\": \"Pool\",\n                     \"monitors\": [\n                         \"http\"\n                     ],\n                     \"members\": [\n                         {\n                             \"servicePort\": 80,\n                             \"serverAddresses\": [\n                                 \"10.1.20.130\"\n                             ]\n                         }\n                     ]\n                 }\n             }\n         }\n     }\n }"
+				},
+				"url": {
+					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare",
+					"protocol": "https",
+					"host": [
+						"{{bigip}}"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare"
+					]
+				},
+				"description": "1 x vip\n1 x pool member\nNamed \"direct\" to allow us to differentiate from the IQ tenants"
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "3ef117cb-cf8a-4c1c-8dc5-f6e20ab37128",
+			"name": "Retrieve info about our new application",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": " {\n     \"class\": \"AS3\",\n     \"action\": \"deploy\",\n     \"persist\": true,\n     \"declaration\": {\n         \"class\": \"ADC\",\n         \"schemaVersion\": \"3.0.0\",\n         \"id\": \"urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d\",\n         \"label\": \"Sample 1\",\n         \"remark\": \"Simple HTTP Service with Round-Robin Load Balancing\",\n         \"Sample_01\": {\n             \"class\": \"Tenant\",\n             \"A1\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.0.1.10\"\n                     ],\n                     \"pool\": \"web_pool\"\n                 },\n                 \"web_pool\": {\n                     \"class\": \"Pool\",\n                     \"monitors\": [\n                         \"http\"\n                     ],\n                     \"members\": [\n                         {\n                             \"servicePort\": 80,\n                             \"serverAddresses\": [\n                                 \"192.0.1.10\",\n                                 \"192.0.1.11\"\n                             ],\n                             \"adminState\": \"disable\"\n                         }\n                     ]\n                 }\n             }\n         }\n     }\n }"
+				},
+				"url": {
+					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare/Direct_Web",
+					"protocol": "https",
+					"host": [
+						"{{bigip}}"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare",
+						"Direct_Web"
+					]
+				},
+				"description": "1 x vip, 2 x pool members"
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "591da91a-eb58-405e-889d-fd937c96cafc",
+			"name": "DeployApp with adminState - 131",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": " {\n     \"$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json\",\n     \"class\": \"AS3\",\n     \"action\": \"deploy\",\n     \"persist\": true,\n     \"declaration\": {\n         \"class\": \"ADC\",\n         \"schemaVersion\": \"3.0.0\",\n         \"id\": \"urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d\",\n         \"label\": \"Sample 1\",\n         \"remark\": \"Simple HTTP Service with Round-Robin Load Balancing\",\n         \"Direct_Mobile\": {\n             \"class\": \"Tenant\",\n             \"cart\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.1.10.131\"\n                     ],\n                     \"pool\": \"web_pool\"\n                 },\n                 \"web_pool\": {\n                     \"class\": \"Pool\",\n                     \"monitors\": [\n                         \"http\"\n                     ],\n                     \"members\": [\n                         {\n                             \"servicePort\": 80,\n                             \"serverAddresses\": [\n                                 \"10.1.20.131\"\n                             ],\n                             \"adminState\": \"disable\"\n                        },\n                        {\n                             \"servicePort\": 8082,\n                             \"serverAddresses\": [\n                                 \"10.1.20.131\"\n                             ]\n                         }\n                     ]\n                 }\n             }\n         }\n     }\n }"
+				},
+				"url": {
+					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare",
+					"protocol": "https",
+					"host": [
+						"{{bigip}}"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare"
+					]
+				},
+				"description": "1 x vip, 3 x pool members each with defined adminState\nUses the tenant (partition) \"sample_0x\" in the line below 'Remark'\n\nRepost this declaration with adminState disabled to disable that pool member"
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "eefd6a6e-01c7-4667-bd09-0158fd372cb3",
+			"name": "Retrieve LOADS of info about our newer application",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": " {\n     \"class\": \"AS3\",\n     \"action\": \"deploy\",\n     \"persist\": true,\n     \"declaration\": {\n         \"class\": \"ADC\",\n         \"schemaVersion\": \"3.0.0\",\n         \"id\": \"urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d\",\n         \"label\": \"Sample 1\",\n         \"remark\": \"Simple HTTP Service with Round-Robin Load Balancing\",\n         \"Sample_01\": {\n             \"class\": \"Tenant\",\n             \"A1\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.0.1.10\"\n                     ],\n                     \"pool\": \"web_pool\"\n                 },\n                 \"web_pool\": {\n                     \"class\": \"Pool\",\n                     \"monitors\": [\n                         \"http\"\n                     ],\n                     \"members\": [\n                         {\n                             \"servicePort\": 80,\n                             \"serverAddresses\": [\n                                 \"192.0.1.10\",\n                                 \"192.0.1.11\"\n                             ],\n                             \"adminState\": \"disable\"\n                         }\n                     ]\n                 }\n             }\n         }\n     }\n }"
+				},
+				"url": {
+					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare/Direct_Mobile?show=full",
+					"protocol": "https",
+					"host": [
+						"{{bigip}}"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare",
+						"Direct_Mobile"
+					],
+					"query": [
+						{
+							"key": "show",
+							"value": "full"
+						}
+					]
+				},
+				"description": "Note the ?show=full at the end of the request"
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "494f6f8e-716f-465b-a7b1-056e614942e8",
+			"name": "Deploy2Apps with adminState - 133_134",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": " {\n     \"$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json\",\n     \"class\": \"AS3\",\n     \"action\": \"deploy\",\n     \"persist\": true,\n     \"declaration\": {\n         \"class\": \"ADC\",\n         \"schemaVersion\": \"3.0.0\",\n         \"id\": \"urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d\",\n         \"label\": \"2Apps Adminstate\",\n         \"remark\": \"2 Apps with one pool member disabled\",\n         \"Direct_Mobile\": {\n             \"class\": \"Tenant\",\n             \"cart\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.1.10.134\"\n                     ],\n                     \"pool\": \"web_pool\"\n                 },\n                 \"web_pool\": {\n                     \"class\": \"Pool\",\n                     \"monitors\": [\n                         \"http\"\n                     ],\n                     \"members\": [\n                         {\n                             \"servicePort\": 80,\n                             \"serverAddresses\": [\n                                 \"10.1.20.134\"\n                             ],\n                             \"adminState\": \"disable\"\n                        },\n                        {\n                             \"servicePort\": 8082,\n                             \"serverAddresses\": [\n                                 \"10.1.20.134\"\n                             ]\n                         }\n                     ]\n                 }\n             },\n             \"search\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.1.10.133\"\n                     ],\n                     \"pool\": \"web_pool\"\n                 },\n                 \"web_pool\": {\n                     \"class\": \"Pool\",\n                     \"monitors\": [\n                         \"http\"\n                     ],\n                     \"members\": [\n                         {\n                             \"servicePort\": 80,\n                             \"serverAddresses\": [\n                                 \"10.1.20.133\"\n                             ],\n                             \"adminState\": \"disable\"\n                        },\n                        {\n                             \"servicePort\": 8082,\n                             \"serverAddresses\": [\n                                 \"10.1.20.133\"\n                             ]\n                         }\n                     ]\n                 }\n             }\n         }\n     }\n }"
+				},
+				"url": {
+					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare",
+					"protocol": "https",
+					"host": [
+						"{{bigip}}"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare"
+					]
+				},
+				"description": "1 x vip, 3 x pool members each with defined adminState\nUses the tenant (partition) \"sample_0x\" in the line below 'Remark'\n\nRepost this declaration with adminState disabled to disable that pool member"
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "c9e03a76-c20e-4fda-947d-9ecadce2d2a7",
+			"name": "DeployHTTPSandAnalytics-WhereToAddClientSSLProfile",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json\",\n    \"class\": \"AS3\",\n    \"action\": \"deploy\",\n    \"persist\": true,\n    \"declaration\": {\n        \"class\": \"ADC\",\n        \"schemaVersion\": \"3.7.0\",\n        \"id\": \"urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d\",\n        \"label\": \"HTTPS\",\n        \"remark\": \"2 apps wHTTPS and AVR Stats\",\n        \"DirectSecure\": {\n            \"class\": \"Tenant\",\n            \"Search\": {\n                \"class\": \"Application\",\n                \"template\": \"https\",\n                \"statsProfile\": {\n                     \"collectMethod\": false,\n                     \"collectClientSideStatistics\": true,\n                     \"class\": \"Analytics_Profile\",\n                     \"collectIp\": true,\n                     \"collectPageLoadTime\": true,\n                     \"collectUrl\": true,\n                     \"collectOsAndBrowser\": true\n                },\n                \"serviceMain\": {\n                    \"class\": \"Service_HTTPS\",\n                    \"virtualAddresses\": [\n                        \"10.1.10.135\"\n                    ],\n                    \"profileAnalytics\": {\n                        \"use\": \"/DirectSecure/Search/statsProfile\"\n                    },\n                    \"serverTLS\": \"webtls\",\n                    \"pool\": \"web_pool\"\n                    },\n                \"web_pool\": {\n                    \"class\": \"Pool\",\n                    \"monitors\": [\n                        \"http\"\n                    ],\n                    \"members\": [{\n                    \"servicePort\": 8082,\n                    \"serverAddresses\": [\n                        \"10.1.20.135\"\n                    ]\n                    },\n                    {\n                    \t\"servicePort\":80,\n                    \"serverAddresses\": [\n                    \t\"10.1.20.135\"\n                    ]}\n                  ]\n                }\n            },\n            \"Web\": {\n                \"class\": \"Application\",\n                \"template\": \"https\",\n                \"statsProfile\": {\n                     \"collectMethod\": false,\n                     \"collectClientSideStatistics\": true,\n                     \"class\": \"Analytics_Profile\",\n                     \"collectIp\": true,\n                     \"collectPageLoadTime\": true,\n                     \"collectUrl\": true,\n                     \"collectOsAndBrowser\": true\n                },\n                \"serviceMain\": {\n                    \"class\": \"Service_HTTPS\",\n                    \"virtualAddresses\": [\n                        \"10.1.10.135\"\n                    ],\n                    \"profileAnalytics\": {\n                        \"use\": \"/OliviaAppTeam/Web/statsProfile\"\n                    },\n                    \"pool\": \"web_pool\",\n                    \"serverTLS\": \"webtls\",\n                    \"persistenceMethods\": [{\n                        \"use\": \"jsessionid\"\n                    }]\n                },\n                \"web_pool\": {\n                    \"class\": \"Pool\",\n                    \"monitors\": [\n                        \"http\"\n                    ],\n                    \"members\": [{\n                    \"servicePort\": 8082,\n                    \"serverAddresses\": [\n                        \"10.1.20.135\"\n                    ]\n                    },\n                    {\n                    \t\"servicePort\":80,\n                    \"serverAddresses\": [\n                    \t\"10.1.20.135\"\n                    ]}\n                  ]\n                },\n                \"webtls\": {\n        \t\t\"class\": \"TLS_Server\",\n        \t\t\"certificates\": [{\n            \t\t\"certificate\": \"webcert\"\n        \t\t\t}]\n        \t\t},\n        \t\t\"webcert\": {\n        \t\t\"class\": \"Certificate\",\n        \t\t\"remark\": \"in practice we recommend using a passphrase\",\n        \t\t\"certificate\": \"-----BEGIN CERTIFICATE-----\\nMIICnDCCAgWgAwIBAgIJAJ5n2b0OCEjwMA0GCSqGSIb3DQEBCwUAMGcxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9uMRAwDgYDVQQHDAdTZWF0dGxlMRQwEgYDVQQKDAtmNV9OZXR3b3JrczEbMBkGA1UEAwwSc2FtcGxlLmV4YW1wbGUubmV0MB4XDTE3MTEyNjE5NTAyNFoXDTE4MDIyNTE5NTAyNFowZzELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUxFDASBgNVBAoMC2Y1X05ldHdvcmtzMRswGQYDVQQDDBJzYW1wbGUuZXhhbXBsZS5uZXQwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALEsuXmSXVQpYjrZPW+WiTBjn491mwZYT7Q92V1HlSBtM6WdWlK1aZN5sovfKtOX7Yrm8xa+e4o/zJ2QYLyyv5O+t2EGN/4qUEjEAPY9mwJdfzRQy6Hyzm84J0QkTuUJ/EjNuPji3D0QJRALUTzu1UqqDCEtiN9OGyXEkh7uvb7BAgMBAAGjUDBOMB0GA1UdDgQWBBSVHPNrGWrjWyZvckQxFYWO59FRFjAfBgNVHSMEGDAWgBSVHPNrGWrjWyZvckQxFYWO59FRFjAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBCwUAA4GBAJeJ9SEckEwPhkXOm+IuqfbUS/RcziifBCTmVyE+Fa/j9pKSYTgiEBNdbJeBEa+gPMlQtbV7Y2dy8TKx/8axVBHiXC5geDML7caxOrAyHYBpnx690xJTh5OIORBBM/a/NvaR+P3CoVebr/NPRh9oRNxnntnqvqD7SW0U3ZPe3tJc\\n-----END CERTIFICATE-----\",\n        \t\t\"privateKey\": \"-----BEGIN RSA PRIVATE KEY-----\\nProc-Type: 4,ENCRYPTED\\nDEK-Info: AES-256-CBC,D8FFCE6B255601587CB54EC29B737D31\\n\\nkv4Fc3Jn0Ujkj0yRjt+gQQfBLSNF2aRLUENXnlr7Xpzqu0Ahr3jS1bAAnd8IWnsR\\nyILqVmKsYF2DoHh0tWiEAQ7/y/fe5DTFhK7N4Wml6kp2yVMkP6KC4ssyYPw27kjK\\nDBwBZ5O8Ioej08A5sgsLCmglbmtSPHJUn14pQnMTmLOpEtOsu6S+2ibPgSNpdg0b\\nCAJNG/KHe+Vkx59qNDyDeKb7FZOlsX30+y67zUq9GQqJEDuysPJ2BUNP0IJXAjst\\nFIt1qNoZew+5KDYs7u/lPxcMGTirUhgI84Jy4WcDvSOsP/tKlxj04TbIE3epmSKy\\n+TihHkwY7ngIGtcm3Sfqk5jz2RXoj1/Ac3SW8kVTYaOUogBhn7zAq4Wju6Et4hQG\\nRGapsJp1aCeZ/a4RCDTxspcKoMaRa97/URQb0hBRGx3DGUhzpmX9zl7JI2Xa5D3R\\nmdBXtjLKYJTdIMdd27prBEKhMUpae2rz5Mw4J907wZeBq/wu+zp8LAnecfTe2nGY\\nE32x1U7gSEdYOGqnwxsOexb1jKgCa67Nw9TmcMPV8zmH7R9qdvgxAbAtwBl1F9OS\\nfcGaC7epf1AjJLtaX7krWmzgASHl28Ynh9lmGMdv+5QYMZvKG0LOg/n3m8uJ6sKy\\nIzzvaJswwn0j5P5+czyoV5CvvdCfKnNb+3jUEN8I0PPwjBGKr4B1ojwhogTM248V\\nHR69D6TxFVMfGpyJhCPkbGEGbpEpcffpgKuC/mEtMqyDQXJNaV5HO6HgAJ9F1P6v\\n5ehHHTMRvzCCFiwndHdlMXUjqSNjww6me6dr6LiAPbejdzhL2vWx1YqebOcwQx3G\\n-----END RSA PRIVATE KEY-----\",\n        \t\t\"passphrase\": {\n            \t\t\"ciphertext\": \"ZjVmNQ==\",\n            \t\t\"protected\": \"eyJhbGciOiJkaXIiLCJlbmMiOiJub25lIn0\"\n        \t\t\t}\n    \t\t\t}\n            }\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare",
+					"protocol": "https",
+					"host": [
+						"{{bigip}}"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare"
+					]
+				},
+				"description": "1 x vip, 3 x pool members each with defined adminState\nUses the tenant (partition) \"sample_0x\" in the line below 'Remark'\n\nRepost this declaration with adminState disabled to disable that pool member"
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "eed878ec-c2a2-4ac0-9be5-c5fa63434bca",
+			"name": "DeployHTTPSandAnalytics",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json\",\n    \"class\": \"AS3\",\n    \"action\": \"deploy\",\n    \"persist\": true,\n    \"declaration\": {\n        \"class\": \"ADC\",\n        \"schemaVersion\": \"3.7.0\",\n        \"id\": \"urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d\",\n        \"label\": \"HTTPS\",\n        \"remark\": \"2 apps wHTTPS and AVR Stats\",\n        \"DirectSecure\": {\n            \"class\": \"Tenant\",\n            \"Search\": {\n                \"class\": \"Application\",\n                \"template\": \"https\",\n                \"statsProfile\": {\n                     \"collectMethod\": false,\n                     \"collectClientSideStatistics\": true,\n                     \"class\": \"Analytics_Profile\",\n                     \"collectIp\": true,\n                     \"collectPageLoadTime\": true,\n                     \"collectUrl\": true,\n                     \"collectOsAndBrowser\": true\n                },\n                \"serviceMain\": {\n                    \"class\": \"Service_HTTPS\",\n                    \"virtualAddresses\": [\n                        \"10.1.10.135\"\n                    ],\n                    \"profileAnalytics\": {\n                        \"use\": \"/DirectSecure/Search/statsProfile\"\n                    },\n                    \"serverTLS\": \"searchwebtls\",\n                    \"pool\": \"web_pool\"\n                    },\n                \"web_pool\": {\n                    \"class\": \"Pool\",\n                    \"monitors\": [\n                        \"http\"\n                    ],\n                    \"members\": [{\n                    \"servicePort\": 8082,\n                    \"serverAddresses\": [\n                        \"10.1.20.135\"\n                    ]\n                    },\n                    {\n                    \t\"servicePort\":80,\n                    \"serverAddresses\": [\n                    \t\"10.1.20.135\"\n                    ]}\n                  ]\n                },\n                \"searchwebtls\": {\n                    \"class\": \"TLS_Server\",\n                    \"certificates\": [{\n                        \"certificate\": \"webcert\"\n                        }]\n                    },\n                    \"webcert\": {\n                    \"class\": \"Certificate\",\n                    \"remark\": \"in practice we recommend using a passphrase\",\n                    \"certificate\": \"-----BEGIN CERTIFICATE-----\\nMIICnDCCAgWgAwIBAgIJAJ5n2b0OCEjwMA0GCSqGSIb3DQEBCwUAMGcxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9uMRAwDgYDVQQHDAdTZWF0dGxlMRQwEgYDVQQKDAtmNV9OZXR3b3JrczEbMBkGA1UEAwwSc2FtcGxlLmV4YW1wbGUubmV0MB4XDTE3MTEyNjE5NTAyNFoXDTE4MDIyNTE5NTAyNFowZzELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUxFDASBgNVBAoMC2Y1X05ldHdvcmtzMRswGQYDVQQDDBJzYW1wbGUuZXhhbXBsZS5uZXQwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALEsuXmSXVQpYjrZPW+WiTBjn491mwZYT7Q92V1HlSBtM6WdWlK1aZN5sovfKtOX7Yrm8xa+e4o/zJ2QYLyyv5O+t2EGN/4qUEjEAPY9mwJdfzRQy6Hyzm84J0QkTuUJ/EjNuPji3D0QJRALUTzu1UqqDCEtiN9OGyXEkh7uvb7BAgMBAAGjUDBOMB0GA1UdDgQWBBSVHPNrGWrjWyZvckQxFYWO59FRFjAfBgNVHSMEGDAWgBSVHPNrGWrjWyZvckQxFYWO59FRFjAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBCwUAA4GBAJeJ9SEckEwPhkXOm+IuqfbUS/RcziifBCTmVyE+Fa/j9pKSYTgiEBNdbJeBEa+gPMlQtbV7Y2dy8TKx/8axVBHiXC5geDML7caxOrAyHYBpnx690xJTh5OIORBBM/a/NvaR+P3CoVebr/NPRh9oRNxnntnqvqD7SW0U3ZPe3tJc\\n-----END CERTIFICATE-----\",\n                    \"privateKey\": \"-----BEGIN RSA PRIVATE KEY-----\\nProc-Type: 4,ENCRYPTED\\nDEK-Info: AES-256-CBC,D8FFCE6B255601587CB54EC29B737D31\\n\\nkv4Fc3Jn0Ujkj0yRjt+gQQfBLSNF2aRLUENXnlr7Xpzqu0Ahr3jS1bAAnd8IWnsR\\nyILqVmKsYF2DoHh0tWiEAQ7/y/fe5DTFhK7N4Wml6kp2yVMkP6KC4ssyYPw27kjK\\nDBwBZ5O8Ioej08A5sgsLCmglbmtSPHJUn14pQnMTmLOpEtOsu6S+2ibPgSNpdg0b\\nCAJNG/KHe+Vkx59qNDyDeKb7FZOlsX30+y67zUq9GQqJEDuysPJ2BUNP0IJXAjst\\nFIt1qNoZew+5KDYs7u/lPxcMGTirUhgI84Jy4WcDvSOsP/tKlxj04TbIE3epmSKy\\n+TihHkwY7ngIGtcm3Sfqk5jz2RXoj1/Ac3SW8kVTYaOUogBhn7zAq4Wju6Et4hQG\\nRGapsJp1aCeZ/a4RCDTxspcKoMaRa97/URQb0hBRGx3DGUhzpmX9zl7JI2Xa5D3R\\nmdBXtjLKYJTdIMdd27prBEKhMUpae2rz5Mw4J907wZeBq/wu+zp8LAnecfTe2nGY\\nE32x1U7gSEdYOGqnwxsOexb1jKgCa67Nw9TmcMPV8zmH7R9qdvgxAbAtwBl1F9OS\\nfcGaC7epf1AjJLtaX7krWmzgASHl28Ynh9lmGMdv+5QYMZvKG0LOg/n3m8uJ6sKy\\nIzzvaJswwn0j5P5+czyoV5CvvdCfKnNb+3jUEN8I0PPwjBGKr4B1ojwhogTM248V\\nHR69D6TxFVMfGpyJhCPkbGEGbpEpcffpgKuC/mEtMqyDQXJNaV5HO6HgAJ9F1P6v\\n5ehHHTMRvzCCFiwndHdlMXUjqSNjww6me6dr6LiAPbejdzhL2vWx1YqebOcwQx3G\\n-----END RSA PRIVATE KEY-----\",\n                    \"passphrase\": {\n                        \"ciphertext\": \"ZjVmNQ==\",\n                        \"protected\": \"eyJhbGciOiJkaXIiLCJlbmMiOiJub25lIn0\"\n                        }\n                    }\n            },\n            \"Web\": {\n                \"class\": \"Application\",\n                \"template\": \"https\",\n                \"statsProfile\": {\n                     \"collectMethod\": false,\n                     \"collectClientSideStatistics\": true,\n                     \"class\": \"Analytics_Profile\",\n                     \"collectIp\": true,\n                     \"collectPageLoadTime\": true,\n                     \"collectUrl\": true,\n                     \"collectOsAndBrowser\": true\n                },\n                \"serviceMain\": {\n                    \"class\": \"Service_HTTPS\",\n                    \"virtualAddresses\": [\n                        \"10.1.10.136\"\n                    ],\n                    \"profileAnalytics\": {\n                        \"use\": \"/DirectSecure/Web/statsProfile\"\n                    },\n                    \"pool\": \"web_pool\",\n                    \"serverTLS\": \"webtls\"\n                },\n                \"web_pool\": {\n                    \"class\": \"Pool\",\n                    \"monitors\": [\n                        \"http\"\n                    ],\n                    \"members\": [{\n                    \"servicePort\": 8082,\n                    \"serverAddresses\": [\n                        \"10.1.20.136\"\n                    ]\n                    },\n                    {\n                    \t\"servicePort\":80,\n                    \"serverAddresses\": [\n                    \t\"10.1.20.136\"\n                    ]}\n                  ]\n                },\n                \"webtls\": {\n        \t\t\"class\": \"TLS_Server\",\n        \t\t\"certificates\": [{\n            \t\t\"certificate\": \"webcert\"\n        \t\t\t}]\n        \t\t},\n        \t\t\"webcert\": {\n        \t\t\"class\": \"Certificate\",\n        \t\t\"remark\": \"in practice we recommend using a passphrase\",\n        \t\t\"certificate\": \"-----BEGIN CERTIFICATE-----\\nMIICnDCCAgWgAwIBAgIJAJ5n2b0OCEjwMA0GCSqGSIb3DQEBCwUAMGcxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9uMRAwDgYDVQQHDAdTZWF0dGxlMRQwEgYDVQQKDAtmNV9OZXR3b3JrczEbMBkGA1UEAwwSc2FtcGxlLmV4YW1wbGUubmV0MB4XDTE3MTEyNjE5NTAyNFoXDTE4MDIyNTE5NTAyNFowZzELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUxFDASBgNVBAoMC2Y1X05ldHdvcmtzMRswGQYDVQQDDBJzYW1wbGUuZXhhbXBsZS5uZXQwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALEsuXmSXVQpYjrZPW+WiTBjn491mwZYT7Q92V1HlSBtM6WdWlK1aZN5sovfKtOX7Yrm8xa+e4o/zJ2QYLyyv5O+t2EGN/4qUEjEAPY9mwJdfzRQy6Hyzm84J0QkTuUJ/EjNuPji3D0QJRALUTzu1UqqDCEtiN9OGyXEkh7uvb7BAgMBAAGjUDBOMB0GA1UdDgQWBBSVHPNrGWrjWyZvckQxFYWO59FRFjAfBgNVHSMEGDAWgBSVHPNrGWrjWyZvckQxFYWO59FRFjAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBCwUAA4GBAJeJ9SEckEwPhkXOm+IuqfbUS/RcziifBCTmVyE+Fa/j9pKSYTgiEBNdbJeBEa+gPMlQtbV7Y2dy8TKx/8axVBHiXC5geDML7caxOrAyHYBpnx690xJTh5OIORBBM/a/NvaR+P3CoVebr/NPRh9oRNxnntnqvqD7SW0U3ZPe3tJc\\n-----END CERTIFICATE-----\",\n        \t\t\"privateKey\": \"-----BEGIN RSA PRIVATE KEY-----\\nProc-Type: 4,ENCRYPTED\\nDEK-Info: AES-256-CBC,D8FFCE6B255601587CB54EC29B737D31\\n\\nkv4Fc3Jn0Ujkj0yRjt+gQQfBLSNF2aRLUENXnlr7Xpzqu0Ahr3jS1bAAnd8IWnsR\\nyILqVmKsYF2DoHh0tWiEAQ7/y/fe5DTFhK7N4Wml6kp2yVMkP6KC4ssyYPw27kjK\\nDBwBZ5O8Ioej08A5sgsLCmglbmtSPHJUn14pQnMTmLOpEtOsu6S+2ibPgSNpdg0b\\nCAJNG/KHe+Vkx59qNDyDeKb7FZOlsX30+y67zUq9GQqJEDuysPJ2BUNP0IJXAjst\\nFIt1qNoZew+5KDYs7u/lPxcMGTirUhgI84Jy4WcDvSOsP/tKlxj04TbIE3epmSKy\\n+TihHkwY7ngIGtcm3Sfqk5jz2RXoj1/Ac3SW8kVTYaOUogBhn7zAq4Wju6Et4hQG\\nRGapsJp1aCeZ/a4RCDTxspcKoMaRa97/URQb0hBRGx3DGUhzpmX9zl7JI2Xa5D3R\\nmdBXtjLKYJTdIMdd27prBEKhMUpae2rz5Mw4J907wZeBq/wu+zp8LAnecfTe2nGY\\nE32x1U7gSEdYOGqnwxsOexb1jKgCa67Nw9TmcMPV8zmH7R9qdvgxAbAtwBl1F9OS\\nfcGaC7epf1AjJLtaX7krWmzgASHl28Ynh9lmGMdv+5QYMZvKG0LOg/n3m8uJ6sKy\\nIzzvaJswwn0j5P5+czyoV5CvvdCfKnNb+3jUEN8I0PPwjBGKr4B1ojwhogTM248V\\nHR69D6TxFVMfGpyJhCPkbGEGbpEpcffpgKuC/mEtMqyDQXJNaV5HO6HgAJ9F1P6v\\n5ehHHTMRvzCCFiwndHdlMXUjqSNjww6me6dr6LiAPbejdzhL2vWx1YqebOcwQx3G\\n-----END RSA PRIVATE KEY-----\",\n        \t\t\"passphrase\": {\n            \t\t\"ciphertext\": \"ZjVmNQ==\",\n            \t\t\"protected\": \"eyJhbGciOiJkaXIiLCJlbmMiOiJub25lIn0\"\n        \t\t\t}\n    \t\t\t}\n            }\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare",
+					"protocol": "https",
+					"host": [
+						"{{bigip}}"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare"
+					]
+				},
+				"description": "1 x vip, 3 x pool members each with defined adminState\nUses the tenant (partition) \"sample_0x\" in the line below 'Remark'\n\nRepost this declaration with adminState disabled to disable that pool member"
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "4e11a771-5bb6-4c29-95fa-e0effdb5fc69",
+			"name": "Delete the application at the end of this URL",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare/Web",
+					"protocol": "https",
+					"host": [
+						"{{bigip}}"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare",
+						"Web"
+					]
+				},
+				"description": "1 x vip, 2 x pool members"
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "fed47f9e-51ce-4976-a7dc-398af86f5f97",
+			"name": "Delete the Tenant at the end of this URL",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{bigip-token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare/Sample_01",
+					"protocol": "https",
+					"host": [
+						"{{bigip}}"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare",
+						"Sample_01"
+					]
+				},
+				"description": "1 x vip, 2 x pool members"
+			},
+			"response": []
+		}
+	]
+}
