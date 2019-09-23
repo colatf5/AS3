@@ -1,13 +1,13 @@
 {
 	"info": {
-		"_postman_id": "d389fcd9-9a52-4afb-8e98-7c6224a97087",
+		"_postman_id": "6cbb2326-254c-4ead-88af-4311495cf1eb",
 		"name": "BIG-IQ AS3 Lab Postman Collection",
 		"description": "Postman Echo is service you can use to test your REST clients and make sample API calls. It provides endpoints for `GET`, `POST`, `PUT`, various auth mechanisms and other utility endpoints.\n\nThe documentation for the endpoints as well as example responses can be found at [https://postman-echo.com](https://postman-echo.com/?source=echo-collection-app-onboarding)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"_postman_id": "395b5f67-bf7b-40ef-9157-28ce88341f88",
+			"_postman_id": "ddc09e99-c4c1-4214-b369-5887fddded82",
 			"name": "BIG-IQ Token (david)",
 			"event": [
 				{
@@ -57,7 +57,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "e058f5c0-ddd5-4f7c-b7d8-ff8485e773e4",
+			"_postman_id": "f3c69dfc-0979-460e-ad27-20d4a5f52823",
 			"name": "BIG-IQ Token (olivia)",
 			"event": [
 				{
@@ -107,7 +107,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "0d66f0f6-1ea0-4d4c-93d5-92ea9edef465",
+			"_postman_id": "a35992c2-da47-430e-9ab2-63f03d0749c8",
 			"name": "BIG-IQ AS3 Declaration",
 			"request": {
 				"auth": {
@@ -154,7 +154,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "bb086884-b4a8-40fd-b728-a6dcc0978987",
+			"_postman_id": "60dbb63e-95fd-4a41-9861-c13274578f2c",
 			"name": "BIG-IQ AS3 Declaration with Analytics - 10.1.x0.112",
 			"request": {
 				"auth": {
@@ -201,7 +201,101 @@
 			"response": []
 		},
 		{
-			"_postman_id": "e75b301f-c6c0-4b79-bbbe-24829a797701",
+			"_postman_id": "6be6c0cf-ea97-4652-97f8-4a2b46c47a67",
+			"name": "OliviaAppTeamHttp",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json\",\r\n    \"class\": \"AS3\",\r\n    \"action\": \"deploy\",\r\n    \"declaration\": {\r\n        \"class\": \"ADC\",\r\n        \"schemaVersion\": \"3.7.0\",\r\n        \"id\": \"fghijkl7890\",\r\n        \"label\": \"Sample 2\",\r\n        \"remark\": \"HTTP with custom persistence\",\r\n        \"target\": {\r\n            \"hostname\": \"SEA-vBIGIP01.termmarc.com\"\r\n        },\r\n        \"OliviaAppTeam\": {\r\n            \"class\": \"Tenant\",\r\n            \"Search\": {\r\n                \"class\": \"Application\",\r\n                \"template\": \"http\",\r\n                \"statsProfile\": {\r\n                     \"collectMethod\": false,\r\n                     \"collectClientSideStatistics\": true,\r\n                     \"class\": \"Analytics_Profile\",\r\n                     \"collectIp\": true,\r\n                     \"collectPageLoadTime\": true,\r\n                     \"collectUrl\": true,\r\n                     \"collectOsAndBrowser\": true\r\n                },\r\n                \"serviceMain\": {\r\n                    \"class\": \"Service_HTTP\",\r\n                    \"virtualAddresses\": [\r\n                        \"10.1.10.132\"\r\n                    ],\r\n                    \"profileAnalytics\": {\r\n                        \"use\": \"/OliviaAppTeam/Search/statsProfile\"\r\n                    },\r\n                    \"pool\": \"web_pool\",\r\n                    \"persistenceMethods\": [{\r\n                        \"use\": \"jsessionid\"\r\n                    }]\r\n                },\r\n                \"web_pool\": {\r\n                    \"class\": \"Pool\",\r\n                    \"monitors\": [\r\n                        \"http\"\r\n                    ],\r\n                    \"members\": [{\r\n                    \"servicePort\": 8082,\r\n                    \"serverAddresses\": [\r\n                        \"10.1.20.132\"\r\n                    ]\r\n                    },\r\n                    {\r\n                    \t\"servicePort\":80,\r\n                    \"serverAddresses\": [\r\n                    \t\"10.1.20.132\"\r\n                    ]}\r\n                  ]\r\n                },\r\n                \"jsessionid\": {\r\n                    \"class\": \"Persist\",\r\n                    \"persistenceMethod\": \"cookie\",\r\n                    \"cookieMethod\": \"hash\",\r\n                    \"cookieName\": \"JSESSIONID\"\r\n                }\r\n            },\r\n            \"Web\": {\r\n                \"class\": \"Application\",\r\n                \"template\": \"http\",\r\n                \"statsProfile\": {\r\n                     \"collectMethod\": false,\r\n                     \"collectClientSideStatistics\": true,\r\n                     \"class\": \"Analytics_Profile\",\r\n                     \"collectIp\": true,\r\n                     \"collectPageLoadTime\": true,\r\n                     \"collectUrl\": true,\r\n                     \"collectOsAndBrowser\": true\r\n                },\r\n                \"serviceMain\": {\r\n                    \"class\": \"Service_HTTP\",\r\n                    \"virtualAddresses\": [\r\n                        \"10.1.10.122\"\r\n                    ],\r\n                    \"profileAnalytics\": {\r\n                        \"use\": \"/OliviaAppTeam/Web/statsProfile\"\r\n                    },\r\n                    \"pool\": \"web_pool\",\r\n                    \"persistenceMethods\": [{\r\n                        \"use\": \"jsessionid\"\r\n                    }]\r\n                },\r\n                \"web_pool\": {\r\n                    \"class\": \"Pool\",\r\n                    \"monitors\": [\r\n                        \"http\"\r\n                    ],\r\n                    \"members\": [{\r\n                    \"servicePort\": 8082,\r\n                    \"serverAddresses\": [\r\n                        \"10.1.20.122\"\r\n                    ]\r\n                    },\r\n                    {\r\n                    \t\"servicePort\":80,\r\n                    \"serverAddresses\": [\r\n                    \t\"10.1.20.122\"\r\n                    ]}\r\n                  ]\r\n                },\r\n                \"jsessionid\": {\r\n                    \"class\": \"Persist\",\r\n                    \"persistenceMethod\": \"cookie\",\r\n                    \"cookieMethod\": \"hash\",\r\n                    \"cookieName\": \"JSESSIONID\"\r\n                }\r\n            }\r\n        }\r\n    }\r\n}"
+				},
+				"url": {
+					"raw": "https://10.1.1.4/mgmt/shared/appsvcs/declare?async=true",
+					"protocol": "https",
+					"host": [
+						"10",
+						"1",
+						"1",
+						"4"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare"
+					],
+					"query": [
+						{
+							"key": "async",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "d37a29af-7384-4a51-8761-44c5f9c94ad1",
+			"name": "OliviaAppTeamHttps",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json\",\r\n    \"class\": \"AS3\",\r\n    \"action\": \"deploy\",\r\n    \"declaration\": {\r\n        \"class\": \"ADC\",\r\n        \"schemaVersion\": \"3.7.0\",\r\n        \"id\": \"fghijkl7890\",\r\n        \"label\": \"Sample 2\",\r\n        \"remark\": \"HTTP with custom persistence\",\r\n        \"target\": {\r\n            \"hostname\": \"SEA-vBIGIP01.termmarc.com\"\r\n        },\r\n        \"OliviaAppTeam\": {\r\n            \"class\": \"Tenant\",\r\n            \"Search\": {\r\n                \"class\": \"Application\",\r\n                \"template\": \"http\",\r\n                \"statsProfile\": {\r\n                     \"collectMethod\": false,\r\n                     \"collectClientSideStatistics\": true,\r\n                     \"class\": \"Analytics_Profile\",\r\n                     \"collectIp\": true,\r\n                     \"collectPageLoadTime\": true,\r\n                     \"collectUrl\": true,\r\n                     \"collectOsAndBrowser\": true\r\n                },\r\n                \"serviceMain\": {\r\n                    \"class\": \"Service_HTTP\",\r\n                    \"virtualAddresses\": [\r\n                        \"10.1.10.132\"\r\n                    ],\r\n                    \"profileAnalytics\": {\r\n                        \"use\": \"/OliviaAppTeam/Search/statsProfile\"\r\n                    },\r\n                    \"pool\": \"web_pool\",\r\n                    \"persistenceMethods\": [{\r\n                        \"use\": \"jsessionid\"\r\n                    }]\r\n                },\r\n                \"web_pool\": {\r\n                    \"class\": \"Pool\",\r\n                    \"monitors\": [\r\n                        \"http\"\r\n                    ],\r\n                    \"members\": [{\r\n                    \"servicePort\": 8082,\r\n                    \"serverAddresses\": [\r\n                        \"10.1.20.132\"\r\n                    ]\r\n                    },\r\n                    {\r\n                    \t\"servicePort\":80,\r\n                    \"serverAddresses\": [\r\n                    \t\"10.1.20.132\"\r\n                    ]}\r\n                  ]\r\n                },\r\n                \"jsessionid\": {\r\n                    \"class\": \"Persist\",\r\n                    \"persistenceMethod\": \"cookie\",\r\n                    \"cookieMethod\": \"hash\",\r\n                    \"cookieName\": \"JSESSIONID\"\r\n                }\r\n            },\r\n            \"Web\": {\r\n                \"class\": \"Application\",\r\n                \"template\": \"https\",\r\n                \"statsProfile\": {\r\n                     \"collectMethod\": false,\r\n                     \"collectClientSideStatistics\": true,\r\n                     \"class\": \"Analytics_Profile\",\r\n                     \"collectIp\": true,\r\n                     \"collectPageLoadTime\": true,\r\n                     \"collectUrl\": true,\r\n                     \"collectOsAndBrowser\": true\r\n                },\r\n                \"serviceMain\": {\r\n                    \"class\": \"Service_HTTPS\",\r\n                    \"virtualAddresses\": [\r\n                        \"10.1.10.122\"\r\n                    ],\r\n                    \"profileAnalytics\": {\r\n                        \"use\": \"/OliviaAppTeam/Web/statsProfile\"\r\n                    },\r\n                    \"pool\": \"web_pool\",\r\n                    \"serverTLS\": \"webtls\",\r\n                    \"persistenceMethods\": [{\r\n                        \"use\": \"jsessionid\"\r\n                    }]\r\n                },\r\n                \"web_pool\": {\r\n                    \"class\": \"Pool\",\r\n                    \"monitors\": [\r\n                        \"http\"\r\n                    ],\r\n                    \"members\": [{\r\n                    \"servicePort\": 8082,\r\n                    \"serverAddresses\": [\r\n                        \"10.1.20.122\"\r\n                    ]\r\n                    },\r\n                    {\r\n                    \t\"servicePort\":80,\r\n                    \"serverAddresses\": [\r\n                    \t\"10.1.20.122\"\r\n                    ]}\r\n                  ]\r\n                },\r\n                \"webtls\": {\r\n        \t\t\"class\": \"TLS_Server\",\r\n        \t\t\"certificates\": [{\r\n            \t\t\"certificate\": \"webcert\"\r\n        \t\t\t}]\r\n        \t\t},\r\n        \t\t\"webcert\": {\r\n        \t\t\"class\": \"Certificate\",\r\n        \t\t\"remark\": \"in practice we recommend using a passphrase\",\r\n        \t\t\"certificate\": \"-----BEGIN CERTIFICATE-----\\nMIICnDCCAgWgAwIBAgIJAJ5n2b0OCEjwMA0GCSqGSIb3DQEBCwUAMGcxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9uMRAwDgYDVQQHDAdTZWF0dGxlMRQwEgYDVQQKDAtmNV9OZXR3b3JrczEbMBkGA1UEAwwSc2FtcGxlLmV4YW1wbGUubmV0MB4XDTE3MTEyNjE5NTAyNFoXDTE4MDIyNTE5NTAyNFowZzELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUxFDASBgNVBAoMC2Y1X05ldHdvcmtzMRswGQYDVQQDDBJzYW1wbGUuZXhhbXBsZS5uZXQwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALEsuXmSXVQpYjrZPW+WiTBjn491mwZYT7Q92V1HlSBtM6WdWlK1aZN5sovfKtOX7Yrm8xa+e4o/zJ2QYLyyv5O+t2EGN/4qUEjEAPY9mwJdfzRQy6Hyzm84J0QkTuUJ/EjNuPji3D0QJRALUTzu1UqqDCEtiN9OGyXEkh7uvb7BAgMBAAGjUDBOMB0GA1UdDgQWBBSVHPNrGWrjWyZvckQxFYWO59FRFjAfBgNVHSMEGDAWgBSVHPNrGWrjWyZvckQxFYWO59FRFjAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBCwUAA4GBAJeJ9SEckEwPhkXOm+IuqfbUS/RcziifBCTmVyE+Fa/j9pKSYTgiEBNdbJeBEa+gPMlQtbV7Y2dy8TKx/8axVBHiXC5geDML7caxOrAyHYBpnx690xJTh5OIORBBM/a/NvaR+P3CoVebr/NPRh9oRNxnntnqvqD7SW0U3ZPe3tJc\\n-----END CERTIFICATE-----\",\r\n        \t\t\"privateKey\": \"-----BEGIN RSA PRIVATE KEY-----\\nProc-Type: 4,ENCRYPTED\\nDEK-Info: AES-256-CBC,D8FFCE6B255601587CB54EC29B737D31\\n\\nkv4Fc3Jn0Ujkj0yRjt+gQQfBLSNF2aRLUENXnlr7Xpzqu0Ahr3jS1bAAnd8IWnsR\\nyILqVmKsYF2DoHh0tWiEAQ7/y/fe5DTFhK7N4Wml6kp2yVMkP6KC4ssyYPw27kjK\\nDBwBZ5O8Ioej08A5sgsLCmglbmtSPHJUn14pQnMTmLOpEtOsu6S+2ibPgSNpdg0b\\nCAJNG/KHe+Vkx59qNDyDeKb7FZOlsX30+y67zUq9GQqJEDuysPJ2BUNP0IJXAjst\\nFIt1qNoZew+5KDYs7u/lPxcMGTirUhgI84Jy4WcDvSOsP/tKlxj04TbIE3epmSKy\\n+TihHkwY7ngIGtcm3Sfqk5jz2RXoj1/Ac3SW8kVTYaOUogBhn7zAq4Wju6Et4hQG\\nRGapsJp1aCeZ/a4RCDTxspcKoMaRa97/URQb0hBRGx3DGUhzpmX9zl7JI2Xa5D3R\\nmdBXtjLKYJTdIMdd27prBEKhMUpae2rz5Mw4J907wZeBq/wu+zp8LAnecfTe2nGY\\nE32x1U7gSEdYOGqnwxsOexb1jKgCa67Nw9TmcMPV8zmH7R9qdvgxAbAtwBl1F9OS\\nfcGaC7epf1AjJLtaX7krWmzgASHl28Ynh9lmGMdv+5QYMZvKG0LOg/n3m8uJ6sKy\\nIzzvaJswwn0j5P5+czyoV5CvvdCfKnNb+3jUEN8I0PPwjBGKr4B1ojwhogTM248V\\nHR69D6TxFVMfGpyJhCPkbGEGbpEpcffpgKuC/mEtMqyDQXJNaV5HO6HgAJ9F1P6v\\n5ehHHTMRvzCCFiwndHdlMXUjqSNjww6me6dr6LiAPbejdzhL2vWx1YqebOcwQx3G\\n-----END RSA PRIVATE KEY-----\",\r\n        \t\t\"passphrase\": {\r\n            \t\t\"ciphertext\": \"ZjVmNQ==\",\r\n            \t\t\"protected\": \"eyJhbGciOiJkaXIiLCJlbmMiOiJub25lIn0\"\r\n        \t\t\t}\r\n    \t\t\t},\r\n                \"jsessionid\": {\r\n                    \"class\": \"Persist\",\r\n                    \"persistenceMethod\": \"cookie\",\r\n                    \"cookieMethod\": \"hash\",\r\n                    \"cookieName\": \"JSESSIONID\"\r\n                }\r\n            }\r\n        }\r\n    }\r\n}"
+				},
+				"url": {
+					"raw": "https://10.1.1.4/mgmt/shared/appsvcs/declare?async=true",
+					"protocol": "https",
+					"host": [
+						"10",
+						"1",
+						"1",
+						"4"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare"
+					],
+					"query": [
+						{
+							"key": "async",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "b1385b9f-7cf7-4ae0-ac0e-5cd313518d77",
 			"name": "BIG-IQ AS3 Declaration with Analytics - 10.1.x0.113",
 			"request": {
 				"auth": {
@@ -248,7 +342,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "e796f5d9-8486-494d-8553-65ff10311113",
+			"_postman_id": "21171f9c-1b64-4c54-b39c-9fffecc94f57",
 			"name": "BIG-IQ AS3 Remove",
 			"request": {
 				"auth": {
@@ -295,7 +389,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "dae88182-545a-4de9-81ba-b644889ce880",
+			"_postman_id": "559058a3-a9dc-4326-8bd4-7ee0f412c0c3",
 			"name": "BIG-IQ Check AS3 Deployment Task",
 			"request": {
 				"auth": {
@@ -337,7 +431,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "3069a10a-40a3-4a9a-852a-113e9e3458c1",
+			"_postman_id": "cd5c755f-193d-435f-9e46-c34aed4f31c7",
 			"name": "BIG-IQ AS3 Templates Creation",
 			"request": {
 				"method": "POST",
@@ -375,7 +469,7 @@
 			"response": []
 		},
 		{
-			"_postman_id": "b537e434-44cb-4c16-b3f1-43381e4d74cb",
+			"_postman_id": "cb0fb808-9e46-4b47-a234-ed82b1b32935",
 			"name": "BIG-IQ AS3 Templates List",
 			"request": {
 				"method": "GET",
