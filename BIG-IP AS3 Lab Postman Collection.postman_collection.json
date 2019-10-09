@@ -1,23 +1,22 @@
 {
 	"info": {
-		"_postman_id": "4e742b38-ffd0-463b-ba5a-4fe0b4a0d88b",
+		"_postman_id": "f187a62e-b2b6-4f21-b62c-ccd9458f52a6",
 		"name": "BIG-IP AS3 Lab Postman Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"_postman_id": "78091b0f-7e08-4994-9407-ca9aedfba320",
 			"name": "Get Auth Token",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "a51be383-d8c5-4808-80fd-f2db3e1d4431",
-						"type": "text/javascript",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"pm.globals.set(\"_f5_token\", jsonData.token.token);"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -31,7 +30,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"username\": \"admin\",\n\t\"password\": \"purple123\",\n\t\"loginProviderName\": \"tmos\"\n}"
+					"raw": "{\n\t\"username\": \"admin\",\n\t\"password\": \"AWSAzure123!\",\n\t\"loginProviderName\": \"tmos\"\n}"
 				},
 				"url": {
 					"raw": "https://{{bigip}}/mgmt/shared/authn/login",
@@ -51,7 +50,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "46c1ba24-7266-4cbb-8da2-9b082c69f523",
 			"name": "Set Auth Token Timeout",
 			"event": [
 				{
@@ -99,7 +97,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "a794e804-04e1-4e82-a885-35846634344d",
 			"name": "Is AS3 there?",
 			"request": {
 				"method": "GET",
@@ -113,10 +110,6 @@
 						"value": "{{_f5_token}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": "{}"
-				},
 				"url": {
 					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/info",
 					"protocol": "https",
@@ -135,7 +128,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "43a7f383-b875-48ce-8917-0922d43d1f8f",
 			"name": "DeploySingleHttpApp - 130",
 			"request": {
 				"method": "POST",
@@ -151,7 +143,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": " {\n     \"$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json\",\n     \"class\": \"AS3\",\n     \"action\": \"deploy\",\n     \"persist\": true,\n     \"declaration\": {\n         \"class\": \"ADC\",\n         \"schemaVersion\": \"3.0.0\",\n         \"id\": \"urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d\",\n         \"label\": \"Seattle\",\n         \"remark\": \"Simple Web App\",\n         \"Direct_Web\": {\n             \"class\": \"Tenant\",\n             \"search\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.1.10.230\"\n                     ],\n                     \"pool\": \"web_pool\"\n                 },\n                 \"web_pool\": {\n                     \"class\": \"Pool\",\n                     \"monitors\": [\n                         \"http\"\n                     ],\n                     \"members\": [\n                         {\n                             \"servicePort\": 80,\n                             \"serverAddresses\": [\n                                 \"10.1.20.130\"\n                             ]\n                         }\n                     ]\n                 }\n             }\n         }\n     }\n }"
+					"raw": " {\n     \"$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json\",\n     \"class\": \"AS3\",\n     \"action\": \"deploy\",\n     \"persist\": true,\n     \"declaration\": {\n         \"class\": \"ADC\",\n         \"schemaVersion\": \"3.5.0\",\n         \"id\": \"urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d\",\n         \"label\": \"Seattle\",\n         \"remark\": \"Simple Web App\",\n         \"CC_Web\": {\n             \"class\": \"Tenant\",\n             \"search\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.1.10.238\"\n                     ],\n                     \"pool\": \"web_pool\"\n                 },\n                 \"web_pool\": {\n                     \"class\": \"Pool\",\n                     \"monitors\": [\n                         \"http\"\n                     ],\n                     \"members\": [\n                         {\n                             \"servicePort\": 80,\n                             \"serverAddresses\": [\n                                 \"10.1.20.138\",\n                                 \"10.1.20.139\"\n                             ]\n                         }\n                     ]\n                 }\n             }\n         }\n     }\n }"
 				},
 				"url": {
 					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare",
@@ -171,7 +163,76 @@
 			"response": []
 		},
 		{
-			"_postman_id": "3ef117cb-cf8a-4c1c-8dc5-f6e20ab37128",
+			"name": "Deploy2Apps with adminState - 133_134",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": " {\n     \"$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json\",\n     \"class\": \"AS3\",\n     \"action\": \"deploy\",\n     \"persist\": true,\n     \"declaration\": {\n         \"class\": \"ADC\",\n         \"schemaVersion\": \"3.0.0\",\n         \"id\": \"urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d\",\n         \"label\": \"2Apps Adminstate\",\n         \"remark\": \"2 Apps with one pool member disabled\",\n         \"CC_SD\": {\n             \"class\": \"Tenant\",\n             \"cart\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.1.10.134\"\n                     ],\n                     \"pool\": \"web_pool\"\n                 },\n                 \"web_pool\": {\n                     \"class\": \"Pool\",\n                     \"monitors\": [\n                         \"http\"\n                     ],\n                     \"members\": [\n                         {\n                             \"servicePort\": 80,\n                             \"serverAddresses\": [\n                                 \"10.1.20.134\"\n                             ],\n                             \"adminState\": \"disable\"\n                        },\n                        {\n                             \"servicePort\": 8082,\n                             \"serverAddresses\": [\n                                 \"10.1.20.134\"\n                             ]\n                         }\n                     ]\n                 }\n             },\n             \"search\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.1.10.133\"\n                     ],\n                     \"pool\": \"web_pool\"\n                 },\n                 \"web_pool\": {\n                     \"class\": \"Pool\",\n                     \"monitors\": [\n                         \"http\"\n                     ],\n                     \"members\": [\n                         {\n                             \"servicePort\": 80,\n                             \"serverAddresses\": [\n                                 \"10.1.20.133\"\n                             ],\n                             \"adminState\": \"disable\"\n                        },\n                        {\n                             \"servicePort\": 8082,\n                             \"serverAddresses\": [\n                                 \"10.1.20.133\"\n                             ]\n                         }\n                     ]\n                 }\n             }\n         }\n     }\n }"
+				},
+				"url": {
+					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare",
+					"protocol": "https",
+					"host": [
+						"{{bigip}}"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare"
+					]
+				},
+				"description": "1 x vip, 3 x pool members each with defined adminState\nUses the tenant (partition) \"sample_0x\" in the line below 'Remark'\n\nRepost this declaration with adminState disabled to disable that pool member"
+			},
+			"response": []
+		},
+		{
+			"name": "DeployAzureSingleAppWithServiceDiscovery",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-F5-Auth-Token",
+						"value": "{{_f5_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n     \"$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json\",\n     \"class\": \"AS3\",\n     \"action\": \"deploy\",\n     \"persist\": true,\n     \"declaration\": {\n         \"class\": \"ADC\",\n         \"schemaVersion\": \"3.5.0\",\n         \"id\": \"urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d\",\n         \"label\": \"ServiceDiscoveryAzure\",\n         \"remark\": \"Simple Web App\",\n         \"CC_SD\": {\n             \"class\": \"Tenant\",\n             \"search\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.3.11.221\"\n                     ],\n                     \"pool\": \"azurePool\"\n                 },\n                 \"azurePool\": {\n                    \"class\": \"Pool\",\n                    \"members\": [\n                        {\n                            \"servicePort\": 80,\n                            \"addressDiscovery\": \"azure\",\n                            \"updateInterval\": 20,\n                            \"resourceGroup\": \"xx\",\n                            \"subscriptionId\": \"xx\",\n                            \"directoryId\": \"xx\",\n                            \"applicationId\": \"xx\",\n                            \"apiAccessKey\": \"xx\",\n                            \"tagKey\": \"colour\",\n                            \"tagValue\": \"green\",\n                            \"addressRealm\": \"private\"\n                        }\n                    ]\n                }\n             }\n         }\n     }\n }"
+				},
+				"url": {
+					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare",
+					"protocol": "https",
+					"host": [
+						"{{bigip}}"
+					],
+					"path": [
+						"mgmt",
+						"shared",
+						"appsvcs",
+						"declare"
+					]
+				},
+				"description": "1 x vip\n1 x pool member\nNamed \"direct\" to allow us to differentiate from the IQ tenants"
+			},
+			"response": []
+		},
+		{
 			"name": "Retrieve info about our new application",
 			"request": {
 				"method": "GET",
@@ -185,10 +246,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": " {\n     \"class\": \"AS3\",\n     \"action\": \"deploy\",\n     \"persist\": true,\n     \"declaration\": {\n         \"class\": \"ADC\",\n         \"schemaVersion\": \"3.0.0\",\n         \"id\": \"urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d\",\n         \"label\": \"Sample 1\",\n         \"remark\": \"Simple HTTP Service with Round-Robin Load Balancing\",\n         \"Sample_01\": {\n             \"class\": \"Tenant\",\n             \"A1\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.0.1.10\"\n                     ],\n                     \"pool\": \"web_pool\"\n                 },\n                 \"web_pool\": {\n                     \"class\": \"Pool\",\n                     \"monitors\": [\n                         \"http\"\n                     ],\n                     \"members\": [\n                         {\n                             \"servicePort\": 80,\n                             \"serverAddresses\": [\n                                 \"192.0.1.10\",\n                                 \"192.0.1.11\"\n                             ],\n                             \"adminState\": \"disable\"\n                         }\n                     ]\n                 }\n             }\n         }\n     }\n }"
-				},
 				"url": {
 					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare/Direct_Web",
 					"protocol": "https",
@@ -208,7 +265,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "591da91a-eb58-405e-889d-fd937c96cafc",
 			"name": "DeployApp with adminState - 131",
 			"request": {
 				"method": "POST",
@@ -244,7 +300,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "eefd6a6e-01c7-4667-bd09-0158fd372cb3",
 			"name": "Retrieve LOADS of info about our newer application",
 			"request": {
 				"method": "GET",
@@ -258,10 +313,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": " {\n     \"class\": \"AS3\",\n     \"action\": \"deploy\",\n     \"persist\": true,\n     \"declaration\": {\n         \"class\": \"ADC\",\n         \"schemaVersion\": \"3.0.0\",\n         \"id\": \"urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d\",\n         \"label\": \"Sample 1\",\n         \"remark\": \"Simple HTTP Service with Round-Robin Load Balancing\",\n         \"Sample_01\": {\n             \"class\": \"Tenant\",\n             \"A1\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.0.1.10\"\n                     ],\n                     \"pool\": \"web_pool\"\n                 },\n                 \"web_pool\": {\n                     \"class\": \"Pool\",\n                     \"monitors\": [\n                         \"http\"\n                     ],\n                     \"members\": [\n                         {\n                             \"servicePort\": 80,\n                             \"serverAddresses\": [\n                                 \"192.0.1.10\",\n                                 \"192.0.1.11\"\n                             ],\n                             \"adminState\": \"disable\"\n                         }\n                     ]\n                 }\n             }\n         }\n     }\n }"
-				},
 				"url": {
 					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare/Direct_Mobile?show=full",
 					"protocol": "https",
@@ -287,43 +338,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "494f6f8e-716f-465b-a7b1-056e614942e8",
-			"name": "Deploy2Apps with adminState - 133_134",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "X-F5-Auth-Token",
-						"value": "{{_f5_token}}"
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": " {\n     \"$schema\": \"https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json\",\n     \"class\": \"AS3\",\n     \"action\": \"deploy\",\n     \"persist\": true,\n     \"declaration\": {\n         \"class\": \"ADC\",\n         \"schemaVersion\": \"3.0.0\",\n         \"id\": \"urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d\",\n         \"label\": \"2Apps Adminstate\",\n         \"remark\": \"2 Apps with one pool member disabled\",\n         \"Direct_Mobile\": {\n             \"class\": \"Tenant\",\n             \"cart\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.1.10.134\"\n                     ],\n                     \"pool\": \"web_pool\"\n                 },\n                 \"web_pool\": {\n                     \"class\": \"Pool\",\n                     \"monitors\": [\n                         \"http\"\n                     ],\n                     \"members\": [\n                         {\n                             \"servicePort\": 80,\n                             \"serverAddresses\": [\n                                 \"10.1.20.134\"\n                             ],\n                             \"adminState\": \"disable\"\n                        },\n                        {\n                             \"servicePort\": 8082,\n                             \"serverAddresses\": [\n                                 \"10.1.20.134\"\n                             ]\n                         }\n                     ]\n                 }\n             },\n             \"search\": {\n                 \"class\": \"Application\",\n                 \"template\": \"http\",\n                 \"serviceMain\": {\n                     \"class\": \"Service_HTTP\",\n                     \"virtualAddresses\": [\n                         \"10.1.10.133\"\n                     ],\n                     \"pool\": \"web_pool\"\n                 },\n                 \"web_pool\": {\n                     \"class\": \"Pool\",\n                     \"monitors\": [\n                         \"http\"\n                     ],\n                     \"members\": [\n                         {\n                             \"servicePort\": 80,\n                             \"serverAddresses\": [\n                                 \"10.1.20.133\"\n                             ],\n                             \"adminState\": \"disable\"\n                        },\n                        {\n                             \"servicePort\": 8082,\n                             \"serverAddresses\": [\n                                 \"10.1.20.133\"\n                             ]\n                         }\n                     ]\n                 }\n             }\n         }\n     }\n }"
-				},
-				"url": {
-					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare",
-					"protocol": "https",
-					"host": [
-						"{{bigip}}"
-					],
-					"path": [
-						"mgmt",
-						"shared",
-						"appsvcs",
-						"declare"
-					]
-				},
-				"description": "1 x vip, 3 x pool members each with defined adminState\nUses the tenant (partition) \"sample_0x\" in the line below 'Remark'\n\nRepost this declaration with adminState disabled to disable that pool member"
-			},
-			"response": []
-		},
-		{
-			"_postman_id": "c9e03a76-c20e-4fda-947d-9ecadce2d2a7",
 			"name": "DeployHTTPSandAnalytics-WhereToAddClientSSLProfile",
 			"request": {
 				"method": "POST",
@@ -359,7 +373,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "eed878ec-c2a2-4ac0-9be5-c5fa63434bca",
 			"name": "DeployHTTPSandAnalytics",
 			"request": {
 				"method": "POST",
@@ -395,44 +408,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "4e11a771-5bb6-4c29-95fa-e0effdb5fc69",
-			"name": "Delete the application at the end of this URL",
-			"request": {
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "X-F5-Auth-Token",
-						"value": "{{_f5_token}}"
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare/Web",
-					"protocol": "https",
-					"host": [
-						"{{bigip}}"
-					],
-					"path": [
-						"mgmt",
-						"shared",
-						"appsvcs",
-						"declare",
-						"Web"
-					]
-				},
-				"description": "1 x vip, 2 x pool members"
-			},
-			"response": []
-		},
-		{
-			"_postman_id": "fed47f9e-51ce-4976-a7dc-398af86f5f97",
 			"name": "Delete the Tenant at the end of this URL",
 			"request": {
 				"method": "DELETE",
@@ -451,7 +426,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare/Sample_01",
+					"raw": "https://{{bigip}}/mgmt/shared/appsvcs/declare/CC_SD",
 					"protocol": "https",
 					"host": [
 						"{{bigip}}"
@@ -461,12 +436,13 @@
 						"shared",
 						"appsvcs",
 						"declare",
-						"Sample_01"
+						"CC_SD"
 					]
 				},
 				"description": "1 x vip, 2 x pool members"
 			},
 			"response": []
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }
