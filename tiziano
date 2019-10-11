@@ -1,0 +1,58 @@
+ {
+     "$schema": "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/schema/latest/as3-schema.json",
+     "class": "AS3",
+     "action": "deploy",
+     "persist": true,
+     "declaration": {
+         "class": "ADC",
+         "schemaVersion": "3.5.0",
+         "id": "urn:uuid:33045210-3ab8-4636-9b2a-c98d22ab915d",
+         "label": "Seattle",
+         "remark": "Simple Web App",
+         "CC_Web": {
+             "class": "Tenant",
+             "search": {
+                 "class": "Application",
+                 "template": "http",
+                 "serviceMain": {
+                     "class": "Service_HTTP",
+                     "iRules": ["Maintenance_iRule"],
+                     "virtualAddresses": [
+                         "10.1.10.238"
+                     ],
+                     "pool": "web_pool"
+                 },
+                 "web_pool": {
+                     "class": "Pool",
+                     "monitors": [
+                         "http"
+                     ],
+                     "members": [
+                         {
+                             "servicePort": 80,
+                             "serverAddresses": [
+                                 "10.1.20.138",
+                                 "10.1.20.139"
+                             ]
+                         }
+                     ]
+                 },
+                 "Maintenance_iRule": {
+                    "class": "iRule",
+                    "iRule": {
+                      "url": "https://raw.githubusercontent.com/f5devcentral/f5-automation-labs/master/files/irules/maintenance-page.irule"
+                 }
+                },
+                 "MyDataGroup": {
+                     "class": "Data_Group",
+                     "label": "example",
+                     "storageType": "external",
+                     "externalFilePath": "https://raw.githubusercontent.com/colatf5/AS3/master/datagroup",
+                     "separator": ":=",
+                     "keyDataType": "string",
+                     "ignoreChanges": false
+                 }
+             }
+         }
+     }
+ }
